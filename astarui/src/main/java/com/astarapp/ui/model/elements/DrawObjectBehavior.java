@@ -21,16 +21,17 @@ public class DrawObjectBehavior implements CellBehavior {
 
     @Override
     public void onAction(FieldCell cell) {
+        if  (cell == null) {
+            reset();
+            return;
+        }
         if (cell.isGoal.get()) {
             return;
         }
+        reset();
         ArrayList<ISearchNode> area = controller.getArea(cell.getX(), cell.getY());
         int objectSize = controller.getObjectSize();
         if (area.size() == objectSize * objectSize) {
-            for (FieldCell obj : this.area) {
-                obj.isObject.set(false);
-            }
-            this.area.clear();
             for (ISearchNode obj : area) {
                 FieldCell fieldCell = (FieldCell) obj;
                 fieldCell.isObject.set(true);
@@ -38,5 +39,13 @@ public class DrawObjectBehavior implements CellBehavior {
             }
             object = cell;
         }
+    }
+
+    private void reset() {
+        for (FieldCell obj : this.area) {
+            obj.isObject.set(false);
+        }
+        this.area.clear();
+        this.object = null;
     }
 }

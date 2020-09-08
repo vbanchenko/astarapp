@@ -1,8 +1,6 @@
 package com.astarapp.ui.controllers;
 
-import com.astarapp.astar.ASearchNode;
 import com.astarapp.astar.AStar;
-import com.astarapp.astar.IGoalNode;
 import com.astarapp.astar.ISearchNode;
 import com.astarapp.ui.UIConfig;
 import com.astarapp.ui.model.elements.CellBehavior;
@@ -13,7 +11,6 @@ import com.astarapp.ui.model.elements.FieldCell;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -81,7 +78,10 @@ public class MainViewController implements Initializable {
         }
         objectSize = 1;
         objectSizeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, objectSize));
-        objectSizeSpinner.valueProperty().addListener((observable, oldValue, newValue) -> objectSize = newValue);
+        objectSizeSpinner.valueProperty().addListener((observable, oldValue, newValue) -> {
+            objectSize = newValue;
+            drawObjectBehavior.onAction(drawObjectBehavior.getObject());
+        });
 
         ToggleGroup toggleGroup = new ToggleGroup();
         toggleGroup.getToggles().addAll(drawObjectToggle, drawWallsToggle, drawGoalToggle);
@@ -124,6 +124,21 @@ public class MainViewController implements Initializable {
         resetButton.setOnAction(event -> resetMap());
     }
 
+    public ArrayList<ISearchNode> getArea(Integer x, Integer y) {
+        int startX = x - objectSize / 2 + 1 - objectSize % 2;
+        int startY = y - objectSize / 2 + 1 - objectSize % 2;
+        ArrayList<ISearchNode> neighbours = new ArrayList<>();
+        for (int i = 0; i < objectSize; i++) {
+            for (int j = 0; j < objectSize; j++) {
+                FieldCell neighbour = getCellByCoords(startX + i, startY + j);
+                if (neighbour != null && !neighbour.isWall()) {
+                    neighbours.add(neighbour);
+                }
+            }
+        }
+        return neighbours;
+    }
+
     private boolean isGoal(ISearchNode other) {
         FieldCell cell = (FieldCell) other;
         ArrayList<ISearchNode> area = getArea(cell.getX(), cell.getY());
@@ -148,38 +163,18 @@ public class MainViewController implements Initializable {
     private ArrayList<ISearchNode> getNeighbours(Integer x, Integer y) {
         int[] neighboursX = {1, -1, 0, 0};
         int[] neighboursY = {0, 0, 1, -1};
-        return (ArrayList<ISearchNode>) getCellsByDimensions(x, y, neighboursX, neighboursY).stream()
-                .filter(fieldCell -> {
-                    FieldCell cell = (FieldCell) fieldCell;
-                    return getArea(cell.getX(), cell.getY()).size() == objectSize * objectSize;
-                })
-                .collect(Collectors.toList());
-    }
-
-    public ArrayList<ISearchNode> getArea(Integer x, Integer y) {
-        int startX = x - objectSize / 2 + 1 - objectSize % 2;
-        int startY = y - objectSize / 2 + 1 - objectSize % 2;
-        ArrayList<ISearchNode> neighbours = new ArrayList<>();
-        for (int i = 0; i < objectSize; i++) {
-            for (int j = 0; j < objectSize; j++) {
-                FieldCell neighbour = getCellByCoords(startX + i, startY + j);
-                if (neighbour != null && !neighbour.isWall()) {
-                    neighbours.add(neighbour);
-                }
-            }
-        }
-        return neighbours;
-    }
-
-    private ArrayList<ISearchNode> getCellsByDimensions(Integer x, Integer y, int[] neighboursX, int[] neighboursY) {
         ArrayList<ISearchNode> neighbours = new ArrayList<>();
         for (int i = 0; i < neighboursX.length; i++) {
             FieldCell neighbour = getCellByCoords(x + neighboursX[i], y + neighboursY[i]);
-            if (neighbour != null && !neighbour.isWall()) {
+            if (neighbour != null && !neighbour.isWall() && areaIsSuitable(neighbour)) {
                 neighbours.add(neighbour);
             }
         }
         return neighbours;
+    }
+
+    private boolean areaIsSuitable(FieldCell cell) {
+        return getArea(cell.getX(), cell.getY()).size() == objectSize * objectSize;
     }
 
     private boolean isValidCoord(double coord) {

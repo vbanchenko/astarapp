@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.Label?>
 <AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="925.0" prefWidth="1283.0" stylesheets="@/css/main.css" xmlns="http://javafx.com/javafx/1.8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.astarapp.ui.controllers.MainViewController">
    <children>
       <GridPane fx:id="mainGrid" prefHeight="916.0" prefWidth="1277.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -24,6 +25,7 @@
          <children>
             <VBox spacing="10.0">
                <children>
+                  <Label text="Object size" maxWidth="1.7976931348623157E308" minWidth="-Infinity" />
                   <Spinner fx:id="objectSizeSpinner" maxWidth="1.7976931348623157E308" minWidth="-Infinity" />
                   <VBox spacing="10.0" style="-fx-border-color: black;">
                      <children>

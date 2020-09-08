@@ -1,6 +1,5 @@
 package com.astarapp.ui;
 
-import com.astarapp.ui.controllers.MainViewController;
 import java.io.InputStream;
 import java.util.Objects;
 import javafx.application.Application;
